@@ -12,15 +12,21 @@ struct Elemento {
     string estadoSeguridad;
 };
 
-
+// Prototipos
 void registrarElemento(Elemento &elemento);
 float calcularFactor(Elemento *elemento);
 void determinarSeguridad(Elemento &elemento);
+
+Elemento* obtenerElementoCritico(
+    Elemento elementos[],
+    int cantidad
+);
 
 int main() {
     Elemento elementos[10];
     int cantidad;
 
+    // Validación de la cantidad
     do {
         cout << "Cuantos elementos desea registrar (1-10): ";
         cin >> cantidad;
@@ -31,7 +37,7 @@ int main() {
 
     } while (cantidad < 1 || cantidad > 10);
 
-   
+    // Registro de los elementos
     for (int i = 0; i < cantidad; i++) {
         cout << "\n--- REGISTRO DEL ELEMENTO "
              << i + 1 << " ---" << endl;
@@ -39,9 +45,7 @@ int main() {
         registrarElemento(elementos[i]);
     }
 
-    cout << "\nRegistro completado correctamente." << endl;
-
-    
+    // Cálculo mediante recorrido con punteros
     Elemento *puntero = elementos;
 
     cout << "\n--- FACTORES Y ESTADOS DE SEGURIDAD ---" << endl;
@@ -58,9 +62,37 @@ int main() {
         puntero++;
     }
 
+    // Obtener un puntero al elemento más comprometido
+    Elemento *elementoCritico =
+        obtenerElementoCritico(elementos, cantidad);
+
+    // Mostrar toda la información del elemento crítico
+    cout << "\n========================================" << endl;
+    cout << "ELEMENTO MAS COMPROMETIDO" << endl;
+    cout << "========================================" << endl;
+
+    cout << "Codigo: " << elementoCritico->codigo << endl;
+    cout << "Nombre: " << elementoCritico->nombre << endl;
+    cout << "Longitud: " << elementoCritico->longitud << endl;
+
+    for (int i = 0; i < 3; i++) {
+        cout << "Carga " << i + 1 << ": "
+             << elementoCritico->cargas[i] << " N" << endl;
+    }
+
+    cout << "Capacidad maxima: "
+         << elementoCritico->capacidadMaxima << " N" << endl;
+
+    cout << "Factor de utilizacion: "
+         << elementoCritico->factorUtilizacion << endl;
+
+    cout << "Estado de seguridad: "
+         << elementoCritico->estadoSeguridad << endl;
+
     return 0;
 }
 
+// Registrar un elemento
 void registrarElemento(Elemento &elemento) {
     cout << "Codigo: ";
     cin >> elemento.codigo;
@@ -90,6 +122,7 @@ void registrarElemento(Elemento &elemento) {
     elemento.estadoSeguridad = "SIN CALCULAR";
 }
 
+// Calcular el factor mediante un puntero
 float calcularFactor(Elemento *elemento) {
     float sumaCargas = 0;
 
@@ -105,7 +138,7 @@ float calcularFactor(Elemento *elemento) {
     return elemento->factorUtilizacion;
 }
 
-
+// Determinar el estado de seguridad
 void determinarSeguridad(Elemento &elemento) {
     if (elemento.factorUtilizacion <= 0.50f) {
         elemento.estadoSeguridad = "SEGURO";
@@ -119,4 +152,25 @@ void determinarSeguridad(Elemento &elemento) {
     else {
         elemento.estadoSeguridad = "SOBRECARGA";
     }
+}
+
+// Encontrar el elemento con el factor más alto
+Elemento* obtenerElementoCritico(
+    Elemento elementos[],
+    int cantidad
+) {
+    Elemento *critico = &elementos[0];
+    Elemento *actual = &elementos[1];
+
+    for (int i = 1; i < cantidad; i++) {
+        if (actual->factorUtilizacion >
+            critico->factorUtilizacion) {
+
+            critico = actual;
+        }
+
+        actual++;
+    }
+
+    return critico;
 }
