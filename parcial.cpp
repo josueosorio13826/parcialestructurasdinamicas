@@ -11,6 +11,9 @@ struct Elemento {
     float factorUtilizacion;
     string estadoSeguridad;
 };
+
+void registrarElemento(Elemento &elemento);
+
 int main () {
 
     Elemento elementos[10];
@@ -25,11 +28,42 @@ int main () {
         }
 
     } while (cantidad < 1 || cantidad > 10);
-
+    
     cout << "Cantidad registrada correctamente: " << cantidad << endl;
+    for (int i = 0; i < cantidad; i++) {
+    cout << "\n--- Registro del elemento " << i + 1 << " ---" << endl;
+    registrarElemento(elementos[i]);
+}
+
+cout << "\nRegistro completado correctamente." << endl;
 
     return 0;
 }
+
+void registrarElemento(Elemento &elemento) {
+cout << "Codigo: ";
+    cin >> elemento.codigo;
+
+    cin.ignore();
+
+    cout << "Nombre: ";
+    getline(cin, elemento.nombre);
+
+    cout << "Longitud: ";
+    cin >> elemento.longitud;
+
+    for (int i = 0; i < 3; i++) {
+        cout << "Carga " << i + 1 << ": ";
+        cin >> elemento.cargas[i];
+    }
+
+    cout << "Capacidad maxima: ";
+    cin >> elemento.capacidadMaxima;
+
+    elemento.factorUtilizacion = 0;
+    elemento.estadoSeguridad = "SIN CALCULAR";
+}
+
 
 
 
