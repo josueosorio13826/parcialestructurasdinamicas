@@ -13,8 +13,11 @@ struct Elemento {
     string estadoSeguridad;
 };
 
+// Prototipos
 void registrarElemento(Elemento &elemento);
+
 float calcularFactor(Elemento *elemento);
+
 void determinarSeguridad(Elemento &elemento);
 
 Elemento* obtenerElementoCritico(
@@ -27,13 +30,18 @@ void aumentarCargas(
     float porcentaje
 );
 
+void generarInforme(
+    Elemento elementos[],
+    int cantidad
+);
+
 int main() {
     Elemento elementos[10];
     int cantidad;
 
     cout << fixed << setprecision(2);
 
-    
+    // PARTE 1: cantidad de elementos
     do {
         cout << "Cuantos elementos desea registrar (1-10): ";
         cin >> cantidad;
@@ -44,7 +52,7 @@ int main() {
 
     } while (cantidad < 1 || cantidad > 10);
 
-   
+    // PARTE 2: registro
     for (int i = 0; i < cantidad; i++) {
         cout << "\n--- REGISTRO DEL ELEMENTO "
              << i + 1 << " ---" << endl;
@@ -52,6 +60,7 @@ int main() {
         registrarElemento(elementos[i]);
     }
 
+    // PARTES 3 Y 4: calcular factor y seguridad
     Elemento *puntero = elementos;
 
     cout << "\n--- FACTORES Y ESTADOS ---" << endl;
@@ -69,7 +78,7 @@ int main() {
         puntero++;
     }
 
-   
+    // PARTE 5: elemento más comprometido
     Elemento *elementoCritico =
         obtenerElementoCritico(elementos, cantidad);
 
@@ -95,6 +104,7 @@ int main() {
     cout << "Estado de seguridad: "
          << elementoCritico->estadoSeguridad << endl;
 
+    // PARTE 6: incremento de cargas
     float porcentaje;
 
     do {
@@ -109,6 +119,7 @@ int main() {
 
     aumentarCargas(*elementoCritico, porcentaje);
 
+    // Recalcular después del incremento
     calcularFactor(elementoCritico);
     determinarSeguridad(*elementoCritico);
 
@@ -118,6 +129,7 @@ int main() {
 
     cout << "Codigo: " << elementoCritico->codigo << endl;
     cout << "Nombre: " << elementoCritico->nombre << endl;
+    cout << "Longitud: " << elementoCritico->longitud << endl;
 
     for (int i = 0; i < 3; i++) {
         cout << "Nueva carga " << i + 1 << ": "
@@ -133,10 +145,13 @@ int main() {
     cout << "Nuevo estado de seguridad: "
          << elementoCritico->estadoSeguridad << endl;
 
+    // PARTE 7: informe general
+    generarInforme(elementos, cantidad);
+
     return 0;
 }
 
-
+// Registrar la información de un elemento
 void registrarElemento(Elemento &elemento) {
     cout << "Codigo: ";
     cin >> elemento.codigo;
@@ -166,7 +181,7 @@ void registrarElemento(Elemento &elemento) {
     elemento.estadoSeguridad = "SIN CALCULAR";
 }
 
-
+// Calcular el factor de utilización
 float calcularFactor(Elemento *elemento) {
     float sumaCargas = 0;
 
@@ -182,6 +197,7 @@ float calcularFactor(Elemento *elemento) {
     return elemento->factorUtilizacion;
 }
 
+// Determinar el estado de seguridad
 void determinarSeguridad(Elemento &elemento) {
     if (elemento.factorUtilizacion <= 0.50f) {
         elemento.estadoSeguridad = "SEGURO";
@@ -197,7 +213,7 @@ void determinarSeguridad(Elemento &elemento) {
     }
 }
 
-
+// Encontrar el elemento con mayor factor
 Elemento* obtenerElementoCritico(
     Elemento elementos[],
     int cantidad
@@ -219,15 +235,94 @@ Elemento* obtenerElementoCritico(
     return critico;
 }
 
-
+// Aumentar las tres cargas
 void aumentarCargas(
     Elemento &elemento,
     float porcentaje
 ) {
-    float multiplicador = 1.0f + porcentaje / 100.0f;
+    float multiplicador =
+        1.0f + porcentaje / 100.0f;
 
     for (int i = 0; i < 3; i++) {
         elemento.cargas[i] =
             elemento.cargas[i] * multiplicador;
     }
+}
+
+// Generar el informe general
+void generarInforme(
+    Elemento elementos[],
+    int cantidad
+) {
+    int cantidadSeguros = 0;
+    int cantidadPrecaucion = 0;
+    int cantidadRiesgo = 0;
+    int cantidadSobrecarga = 0;
+
+    float sumaFactores = 0;
+
+    Elemento *puntero = elementos;
+
+    cout << "\n========================================" << endl;
+    cout << "INFORME GENERAL DE LA ESTRUCTURA" << endl;
+    cout << "========================================" << endl;
+
+    for (int i = 0; i < cantidad; i++) {
+        float sumaCargas = 0;
+
+        for (int j = 0; j < 3; j++) {
+            sumaCargas += puntero->cargas[j];
+        }
+
+        float cargaPromedio = sumaCargas / 3.0f;
+
+        cout << "\nElemento " << i + 1 << endl;
+        cout << "Codigo: " << puntero->codigo << endl;
+        cout << "Nombre: " << puntero->nombre << endl;
+        cout << "Carga promedio: "
+             << cargaPromedio << " N" << endl;
+        cout << "Factor de utilizacion: "
+             << puntero->factorUtilizacion << endl;
+        cout << "Estado: "
+             << puntero->estadoSeguridad << endl;
+
+        sumaFactores += puntero->factorUtilizacion;
+
+        if (puntero->estadoSeguridad == "SEGURO") {
+            cantidadSeguros++;
+        }
+        else if (puntero->estadoSeguridad == "PRECAUCION") {
+            cantidadPrecaucion++;
+        }
+        else if (puntero->estadoSeguridad == "RIESGO") {
+            cantidadRiesgo++;
+        }
+        else if (puntero->estadoSeguridad == "SOBRECARGA") {
+            cantidadSobrecarga++;
+        }
+
+        puntero++;
+    }
+
+    float factorPromedio =
+        sumaFactores / cantidad;
+
+    cout << "\n========================================" << endl;
+    cout << "RESUMEN DE SEGURIDAD" << endl;
+    cout << "========================================" << endl;
+
+    cout << "Elementos SEGUROS: "
+         << cantidadSeguros << endl;
+
+    cout << "Elementos en PRECAUCION: "
+         << cantidadPrecaucion << endl;
+
+    cout << "Elementos en RIESGO: "
+         << cantidadRiesgo << endl;
+
+    cout << "Elementos en SOBRECARGA: "
+         << cantidadSobrecarga << endl;
+
+    cout << "Factor promedio de la estructura: "
+         << factorPromedio << endl;
 }
