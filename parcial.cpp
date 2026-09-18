@@ -12,11 +12,12 @@ struct Elemento {
     string estadoSeguridad;
 };
 
+
 void registrarElemento(Elemento &elemento);
 float calcularFactor(Elemento *elemento);
+void determinarSeguridad(Elemento &elemento);
 
-int main () {
-
+int main() {
     Elemento elementos[10];
     int cantidad;
 
@@ -29,37 +30,43 @@ int main () {
         }
 
     } while (cantidad < 1 || cantidad > 10);
-    
-    cout << "Cantidad registrada correctamente: " << cantidad << endl;
+
+   
     for (int i = 0; i < cantidad; i++) {
-    cout << "\n--- Registro del elemento " << i + 1 << " ---" << endl;
-    registrarElemento(elementos[i]);
-}
+        cout << "\n--- REGISTRO DEL ELEMENTO "
+             << i + 1 << " ---" << endl;
 
-cout << "\nRegistro completado correctamente." << endl;
-Elemento *puntero = elementos;
+        registrarElemento(elementos[i]);
+    }
 
-    cout << "\n--- FACTORES DE UTILIZACION ---" << endl;
+    cout << "\nRegistro completado correctamente." << endl;
+
+    
+    Elemento *puntero = elementos;
+
+    cout << "\n--- FACTORES Y ESTADOS DE SEGURIDAD ---" << endl;
 
     for (int i = 0; i < cantidad; i++) {
         float factor = calcularFactor(puntero);
 
-        cout << "Elemento: " << puntero->nombre << endl;
+        determinarSeguridad(*puntero);
+
+        cout << "\nElemento: " << puntero->nombre << endl;
         cout << "Factor de utilizacion: " << factor << endl;
+        cout << "Estado: " << puntero->estadoSeguridad << endl;
 
         puntero++;
     }
+
     return 0;
 }
 
 void registrarElemento(Elemento &elemento) {
-cout << "Codigo: ";
+    cout << "Codigo: ";
     cin >> elemento.codigo;
 
-    cin.ignore();
-
     cout << "Nombre: ";
-    getline(cin, elemento.nombre);
+    getline(cin >> ws, elemento.nombre);
 
     cout << "Longitud: ";
     cin >> elemento.longitud;
@@ -69,8 +76,15 @@ cout << "Codigo: ";
         cin >> elemento.cargas[i];
     }
 
-    cout << "Capacidad maxima: ";
-    cin >> elemento.capacidadMaxima;
+    do {
+        cout << "Capacidad maxima: ";
+        cin >> elemento.capacidadMaxima;
+
+        if (elemento.capacidadMaxima <= 0) {
+            cout << "La capacidad debe ser mayor que cero." << endl;
+        }
+
+    } while (elemento.capacidadMaxima <= 0);
 
     elemento.factorUtilizacion = 0;
     elemento.estadoSeguridad = "SIN CALCULAR";
@@ -83,7 +97,7 @@ float calcularFactor(Elemento *elemento) {
         sumaCargas += elemento->cargas[i];
     }
 
-    float cargaPromedio = sumaCargas / 3.0;
+    float cargaPromedio = sumaCargas / 3.0f;
 
     elemento->factorUtilizacion =
         cargaPromedio / elemento->capacidadMaxima;
@@ -92,5 +106,17 @@ float calcularFactor(Elemento *elemento) {
 }
 
 
-
-
+void determinarSeguridad(Elemento &elemento) {
+    if (elemento.factorUtilizacion <= 0.50f) {
+        elemento.estadoSeguridad = "SEGURO";
+    }
+    else if (elemento.factorUtilizacion <= 0.80f) {
+        elemento.estadoSeguridad = "PRECAUCION";
+    }
+    else if (elemento.factorUtilizacion <= 1.00f) {
+        elemento.estadoSeguridad = "RIESGO";
+    }
+    else {
+        elemento.estadoSeguridad = "SOBRECARGA";
+    }
+}
